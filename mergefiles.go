@@ -27,9 +27,9 @@ type fileInfo struct {
 type stringSliceFlag []string
 
 const (
-	HEADER_TEMPLATE = "--- START FILE: %s ---\n```\n"
-	FOOTER      = "\n```\n--- END FILE ---\n\n"
-	FOOTER_SIZE = int64(len(FOOTER))
+	headerTemplate = "--- START FILE: %s ---\n```\n"
+	footer      = "\n```\n--- END FILE ---\n\n"
+	footerSize = int64(len(footer))
 )
 
 func (i *stringSliceFlag) String() string {
@@ -45,7 +45,7 @@ func main() {
 	// --- Argumente parsen ---
 	srcDir := flag.String("dir", ".", "Quellverzeichnis (rekursiv durchsucht)")
 	outFile := flag.String("out", "output.txt", "Zieldatei")
-	prompt := flag.String("prompt", "default", "Prompt")
+	promptKey := flag.String("prompt", "default", "Prompt")
 	var extensionsFlag stringSliceFlag
 	flag.Var(&extensionsFlag, "ext", "Dateierweiterung (kann mehrfach verwendet werden, z.B. -ext .txt -ext .md)")
 
@@ -72,10 +72,10 @@ func main() {
 
 	conf, err := InitConfig()
 	if err != nil {
-		os.Exit(1)
+		log.Fatalf("Error initializing configuration: %v", err)
 	}
 
-	*prompt = conf.LookupPrompt(*prompt)
+	prompt := conf.LookupPrompt(*promptKey)
 
 	// --- Erweiterungen vorbereiten (als Set für schnelles Nachschlagen) ---
 	extensions := make(map[string]struct{})
@@ -96,7 +96,7 @@ func main() {
 
 	// --- Phase 1: Dateien sammeln und Größen berechnen ---
 	fmt.Println("Phase 1: Sammle Dateien und berechne Gesamtgröße...")
-	filesToProcess, totalSize, err := collectFilesAndSizes(*prompt, srcDirAbs, extensions, processAllExtensions)
+	filesToProcess, totalSize, err := collectFilesAndSizes(prompt, srcDirAbs, extensions, processAllExtensions)
 	if err != nil {
 		log.Fatalf("Fehler beim Sammeln der Dateien: %v", err)
 	}
@@ -110,7 +110,7 @@ func main() {
 
 	// --- Phase 2: Zieldatei erstellen, mappen und parallel befüllen ---
 	fmt.Println("Phase 2: Erstelle Zieldatei und schreibe Inhalte parallel...")
-	err = createAndPopulateOutput(*prompt, *outFile, totalSize, filesToProcess)
+	err = createAndPopulateOutput(prompt, *outFile, totalSize, filesToProcess)
 	if err != nil {
 		log.Fatalf("Fehler beim Erstellen oder Schreiben der Zieldatei: %v", err)
 	}
@@ -167,7 +167,7 @@ func collectFilesAndSizes(prompt string, rootDir string, extensions map[string]s
 		relativePath = filepath.ToSlash(relativePath)
 
 		// Berechne Header und dessen Größe
-		header := fmt.Sprintf(HEADER_TEMPLATE, relativePath)
+		header := fmt.Sprintf(headerTemplate, relativePath)
 		headerSize := int64(len(header))
 		contentSize := info.Size()
 
@@ -178,7 +178,7 @@ func collectFilesAndSizes(prompt string, rootDir string, extensions map[string]s
 			contentSize:  contentSize,
 			headerSize:   headerSize,
 		})
-		totalSize += headerSize + contentSize + FOOTER_SIZE
+		totalSize += headerSize + contentSize + footerSize
 
 		return nil
 	})
@@ -239,7 +239,7 @@ func createAndPopulateOutput(prompt string, outFilePath string, totalSize int64,
 			defer wg.Done()
 
 			// 1. Header schreiben
-			header := fmt.Sprintf(HEADER_TEMPLATE, fInfo.relativePath)
+			header := fmt.Sprintf(headerTemplate, fInfo.relativePath)
 			headerBytes := []byte(header)
 			copy(mappedData[offset:offset+fInfo.headerSize], headerBytes)
 
@@ -267,12 +267,12 @@ func createAndPopulateOutput(prompt string, outFilePath string, totalSize int64,
 
 			// 1. Footer schreiben
 			footerOffset := offset + fInfo.headerSize + fInfo.contentSize
-			copy(mappedData[footerOffset:footerOffset+FOOTER_SIZE], []byte(FOOTER))
+			copy(mappedData[footerOffset:footerOffset+footerSize], []byte(footer))
 
 		}()
 
 		// Aktualisiere den Offset für die nächste Datei
-		currentOffset += fInfo.headerSize + fInfo.contentSize + FOOTER_SIZE
+		currentOffset += fInfo.headerSize + fInfo.contentSize + footerSize
 	}
 
 	// --- Auf alle Goroutines warten ---
