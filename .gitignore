@@ -40,3 +40,6 @@ Thumbs.db
 # goreleaser
 dist/
 .goreleaser.yaml.bak
+
+# secrets
+SECRETS
