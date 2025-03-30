@@ -36,3 +36,7 @@ mergefiles
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# goreleaser
+dist/
+.goreleaser.yaml.bak

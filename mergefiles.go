@@ -8,11 +8,18 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 
 	"golang.org/x/sys/unix" // Für Linux/macOS mmap
 	// Für Windows: import "golang.org/x/sys/windows"
+)
+
+var (
+	version              = "dev"
+	date                 = "unknown"
+	commit               = "HEAD"
 )
 
 // fileInfo speichert Informationen über eine zu verarbeitende Datei
@@ -46,10 +53,17 @@ func main() {
 	srcDir := flag.String("dir", ".", "Quellverzeichnis (rekursiv durchsucht)")
 	outFile := flag.String("out", "output.txt", "Zieldatei")
 	promptKey := flag.String("prompt", "default", "Prompt")
+
 	var extensionsFlag stringSliceFlag
 	flag.Var(&extensionsFlag, "ext", "Dateierweiterung (kann mehrfach verwendet werden, z.B. -ext .txt -ext .md)")
+	showVersion := flag.Bool("v", false, "Show version")
 
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Print(buildVersion()+"\n")
+		return
+	}
 
 	// --- Eingaben validieren ---
 	if *srcDir == "" || *outFile == "" {
@@ -285,4 +299,16 @@ func createAndPopulateOutput(prompt string, outFilePath string, totalSize int64,
 
 	fmt.Println("Paralleles Schreiben abgeschlossen.")
 	return nil // Unmap und Schließen der Datei erfolgt durch defer
+}
+
+func buildVersion() string {
+	result := version
+	if commit != "" {
+		result = fmt.Sprintf("%s\ncommit: %s", result, commit)
+	}
+	if date != "" {
+		result = fmt.Sprintf("%s\nbuilt at: %s", result, date)
+	}
+	result = fmt.Sprintf("%s\ngoos: %s\ngoarch: %s", result, runtime.GOOS, runtime.GOARCH)
+	return result
 }
