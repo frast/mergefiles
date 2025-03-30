@@ -3,7 +3,7 @@
 	"image": "mcr.microsoft.com/devcontainers/go:1.24-bookworm",
 	"features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {},
-		"ghcr.io/frast/mergefiles:1": { "releaseVersion": "0.1.4" }
+		"ghcr.io/frast/mergefiles/mergefiles:1": { "releaseVersion": "v0.1.4" }
 	},
 
 	"postAttachCommand": {
