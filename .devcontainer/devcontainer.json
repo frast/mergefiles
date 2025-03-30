@@ -1,0 +1,30 @@
+{
+	"name": "Go MergeFiles Dev",
+	"image": "mcr.microsoft.com/devcontainers/go:1.24-bookworm",
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {}
+	},
+
+	"postAttachCommand": {
+	  "server": "if [ -f go.mod ]; then echo 'go.mod found, running go mod download...'; go mod download; else echo 'go.mod not found. Run \"go mod init <your-module-name>\" manually.'; fi"
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"golang.Go"
+			],
+			"settings": {
+				"go.toolsManagement.autoUpdate": true,
+				"go.useLanguageServer": true,
+				"go.formatTool": "gofmt",
+				"editor.formatOnSave": true,
+				"[go]": {
+					"editor.defaultFormatter": "golang.go",
+					"editor.formatOnSave": true
+				}
+			}
+		}
+	},
+	"remoteUser": "vscode"
+}
