@@ -22,8 +22,8 @@ builds:
 archives:
   - formats: [ 'tar.gz' ]
     name_template: >-
-      {{ .ProjectName }}_
-      v{{- .Version }}_
+      {{ .ProjectName }}_v
+      {{- .Version }}_
       {{- .Os }}_
       {{- .Arch }}
     files:
