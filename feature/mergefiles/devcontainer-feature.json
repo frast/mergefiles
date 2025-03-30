@@ -7,9 +7,9 @@
         "releaseVersion": {
             "type": "string",
             "proposals": [
-                "v0.1.3"
+                "v0.1.4"
             ],
-            "default": "v0.1.3",
+            "default": "v0.1.4",
             "description": "Select release version of mergefiles published at https://github.com/frast/mergefiles"
         }
     },

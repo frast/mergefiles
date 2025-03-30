@@ -8,7 +8,7 @@ A feature to help with generating a merged file for prompting LLMs
 ```json
 "features": {
     "ghcr.io/frast/mergefiles/mergefiles:1": {
-        "releaseVersion": "v0.1.3"
+        "releaseVersion": "v0.1.4"
     }
 }
 ```
