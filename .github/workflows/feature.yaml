@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Publish Feature"
+        uses: devcontainers/action@v1
+        with:
+          publish-features: "true"
+          base-path-to-features: "./feature"
+          generate-docs: "false"
+          
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

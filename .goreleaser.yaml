@@ -1,3 +1,4 @@
+version: 2
 before:
   hooks:
     - go mod tidy
@@ -22,7 +23,7 @@ archives:
   - formats: [ 'tar.gz' ]
     name_template: >-
       {{ .ProjectName }}_
-      {{- .Version }}_
+      v{{- .Version }}_
       {{- .Os }}_
       {{- .Arch }}
     files:

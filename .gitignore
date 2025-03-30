@@ -20,7 +20,6 @@ go.work
 
 # Generated output file
 output.txt
-mergefiles
 
 # IDE directories
 .idea/
